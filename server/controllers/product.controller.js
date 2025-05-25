@@ -41,51 +41,89 @@ exports.getProducts = async (req, res) => {
   try {
     const {
       search,
-      categoryId,
       minPrice,
       maxPrice,
       inStock,
+      categoryId,
       sort,
     } = req.query;
 
+    // Log entire query to debug
+    console.log('req.query:', req.query);
+
+    // Support both "categoryIds" and "categoryIds[]" keys
+    const rawCategoryIds = req.query.categoryIds || req.query['categoryIds[]'];
+
+    console.log('categoryIds:', req.query.categoryIds);
+    console.log('categoryIds[]:', req.query['categoryIds[]']);
+
     const whereClause = {};
 
+    // Search by product name
     if (search) {
       whereClause.name = {
         [Op.like]: `%${search}%`,
       };
     }
 
-    if (categoryId) {
+    // Filter by multiple categories
+    if (rawCategoryIds) {
+      const categoryIds = Array.isArray(rawCategoryIds)
+        ? rawCategoryIds.map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+        : rawCategoryIds
+            .split(',')
+            .map(id => parseInt(id.trim(), 10))
+            .filter(id => !isNaN(id));
+
+      if (categoryIds.length > 0) {
+        whereClause.categoryId = {
+          [Op.in]: categoryIds,
+        };
+      }
+    }
+
+      if (categoryId && categoryId>0) {
       whereClause.categoryId = categoryId;
     }
 
+
+
+    // Filter by price range
     if (minPrice || maxPrice) {
       whereClause.price = {};
       if (minPrice) whereClause.price[Op.gte] = parseFloat(minPrice);
       if (maxPrice) whereClause.price[Op.lte] = parseFloat(maxPrice);
     }
 
+    // Filter by stock availability
     if (inStock === 'true') {
-      whereClause.stock = { [Op.gt]: 0 };
+      whereClause.stock = {
+        [Op.gt]: 0,
+      };
     }
 
+    // Sorting
     const order = [];
     if (sort === 'price_asc') order.push(['price', 'ASC']);
     if (sort === 'price_desc') order.push(['price', 'DESC']);
 
     const products = await Product.findAll({
       where: whereClause,
-      include: [{ model: Category, as: 'category' }],
+      include: [
+        {
+          model: Category,
+          as: 'category',
+        },
+      ],
       order,
     });
 
     res.json(products);
   } catch (err) {
+    console.error('Error fetching products:', err);
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // Get single product by ID
 exports.getProduct = async (req, res) => {

@@ -2,11 +2,11 @@ const router = require("express").Router();
 const cartController = require("../controllers/cart.controller");
 const { checkAccessToken } = require("../middlewares/auth.middleware");
 
-router.use(checkAccessToken); // Apply to all cart routes
+ 
 
-router.get("/", cartController.getCartItems);
-router.post("/", cartController.addToCart);
-router.put("/:id", cartController.updateCartItem);
-router.delete("/:id", cartController.removeCartItem);
+router.get("/",checkAccessToken, cartController.getCartItems);
+router.post("/", checkAccessToken,cartController.addToCart);
+router.put("/:id",checkAccessToken, cartController.updateCartItem);
+router.delete("/:id",checkAccessToken, cartController.removeCartItem);
 
 module.exports = router;

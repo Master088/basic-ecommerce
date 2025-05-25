@@ -75,7 +75,7 @@ module.exports = {
   },
   expressRateLimitOptions: {
     windowMs: 60 * 1000,
-    max: 10,
+    max: 200,
     message: 'Too Many Requests',
     statusCode: 429,
     legacyHeaders: true,

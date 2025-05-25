@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       customerName: { type: DataTypes.STRING, allowNull: false },
       customerEmail: { type: DataTypes.STRING, allowNull: false },
       customerAddress: { type: DataTypes.TEXT, allowNull: false },
-      status: {
-        type: DataTypes.ENUM('pending', 'on_the_way', 'completed', 'cancelled'),
+      status: {  
+        type: DataTypes.ENUM('pending', 'processing', 'completed', 'cancelled'),
         defaultValue: 'pending',
       },
       totalAmount: { type: DataTypes.FLOAT, allowNull: false, defaultValue: 0.0,}

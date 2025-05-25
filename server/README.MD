@@ -4,8 +4,4 @@ Backend Tech Stack
 - OpenAI
 
 
-
-Backend Tech Stack
-
-- NodeJS + Express
-- OpenAI
+ 
